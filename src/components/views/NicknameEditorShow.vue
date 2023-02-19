@@ -1,5 +1,36 @@
 <script>
 export default {
+
+    data() {
+        return {
+            inputCurrNickname: "",
+            inputNewNickname: "",
+            currNickname: "",
+            newNickname: "",
+
+            isValidateCurrNickname: false,
+            isValidateNewNickname: false,
+            currNicknameMsg: "",
+            newNicknameMsg: "",
+        }
+    },
+
+    methods: {
+
+        async vaidateCurrNickname() {
+            const res = await this.axios.get(`/userinfo`);
+            let users = res.data.content;
+
+            if (users.filter(user => user.nickname = this.inputCurrNickname).length !== 0) {
+                this.currNicknameMsg = "유저 조회 성공!";
+                this.isValidateCurrNickname = true;
+                this.currNickname = this.inputCurrNickname;
+            } else {
+                this.currNicknameMsg = "존재 하지 않는 유저입니다.";
+                this.isValidateCurrNickname = false;
+            }
+        },
+    }
     
 }
 </script>
