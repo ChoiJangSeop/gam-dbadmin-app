@@ -1,5 +1,46 @@
 <script>
+import { BIconExclamationCircle } from 'bootstrap-icons-vue';
 export default {
+
+    components: { BIconExclamationCircle },
+
+    data() {
+        return {
+            users: [
+                {
+                    id: "huni",
+                    pwd: "huni",
+                    name: "기여운명후니",
+                },
+            ],
+
+            inputId: "",
+            inputPwd: "",
+            msg : "",
+        }
+    },
+
+    methods: {
+        validateAccount() {
+
+            let currUser = this.users.filter(user => user.id === this.inputId);
+
+            if (currUser.length === 0) {
+                this.msg = "존재 하지 않는 아이디 입니다.";
+                this.inputId = "";
+                this.inputPwd =  "";
+            }
+
+            else if (currUser[0].pwd !== this.inputPwd) {
+                this.msg = "비밀번호를 잘못 입력했습니다.";
+                this.inputPwd = "";
+            }
+
+            else {
+
+            }
+        }
+    }
     
 }
 </script>
@@ -9,10 +50,11 @@ export default {
         <div id="title" class="main-text">GAM DB 관리자 페이지</div>
         <div id="versionInfo" class="main-text">버전 1.0.0</div>
         <div id="input-admin-info" class="row-container">
-            <input id="idInput" class="input-block" type="text" placeholder="아이디">
-            <input id="pwInput" class="input-block" type="password" placeholder="패스워드">
+            <input id="idInput" class="input-block" type="text" v-model="inputId" placeholder="아이디">
+            <input id="pwInput" class="input-block" type="password" v-model="inputPwd" placeholder="패스워드">
         </div>
-        <button id="loginButton" class="main-text">로그인</button>
+        <div id="message" class="main-text"><BIconExclamationCircle v-if="msg !== ''"/> {{ msg }}</div>
+        <button id="loginButton" class="main-text" @click="validateAccount()">로그인</button>
     </div>
 </template>
 
@@ -81,6 +123,12 @@ export default {
     border-radius: 5px;
     margin-top: 20px;
     
+}
+
+#message {
+    width: 630px;
+    margin-top: 20px;
+    color: red;
 }
 
 </style>
