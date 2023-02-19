@@ -22,14 +22,14 @@ export default {
             <div id="contentTitle"><h2>관리자 기능</h2></div>
             <div class="method-container row-container">
                 <div class="method-content">
-                    <a class="method-url" href="xxx">유저 닉네임 변경</a>
+                    <a class="method-url" href="/nickname-editor">유저 닉네임 변경</a>
                     <p>현재의 닉네임과 변경할 닉네임을 입력해 유저의 닉네임을 변경합니다.</p>
                 </div>
             </div>
 
             <div class="method-container row-container">
                 <div class="method-content">
-                    <a class="method-url" heft="xxx">아이템 지급</a>
+                    <a class="method-url" href="/item-dispenser">아이템 지급</a>
                     <p>아이템을 주고 받을 유저의 닉네임과 아이템을 입력하여 선물함에 아이템을 지급합니다.<br>
                     주는 유저를 입력하지 않을 경우, 관리자의 이름으로 아이템이 지급됩니다.</p>
                 </div>
