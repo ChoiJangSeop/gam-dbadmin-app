@@ -1,5 +1,8 @@
 <script>
+import { BIconExclamationCircle } from 'bootstrap-icons-vue';
 export default {
+
+    components: { BIconExclamationCircle },
 
     data() {
         return {
@@ -17,11 +20,12 @@ export default {
 
     methods: {
 
-        async vaidateCurrNickname() {
-            const res = await this.axios.get(`/userinfo`);
-            let users = res.data.content;
+        async validateCurrNickname() {
+            const res = await this.$axios.get(`/userinfo/nickname/${this.inputCurrNickname}`);
+            const user = res.data;
+            console.log(user);
 
-            if (users.filter(user => user.nickname = this.inputCurrNickname).length !== 0) {
+            if (user.id !== undefined) {
                 this.currNicknameMsg = "유저 조회 성공!";
                 this.isValidateCurrNickname = true;
                 this.currNickname = this.inputCurrNickname;
@@ -30,6 +34,65 @@ export default {
                 this.isValidateCurrNickname = false;
             }
         },
+
+        async validateNewNickname() {
+            const res = await this.$axios.get(`/userinfo`);
+            console.log(res);
+            const users = res.data._embedded.userInfoDtoList;
+            console.log(users);
+
+            const space_str = /\s/;
+            const special_str = /[~!@#$%^&*()_+|<>?:{}]/;
+
+            if (users.filter(user => user.nickname === this.inputNewNickname).length > 0) {
+                this.newNicknameMsg = "이미 존재하는 닉네임입니다.";
+                this.isValidateNewNickname = false;
+            } else if (this.inputNewNickname.length > 10) {
+                this.newNicknameMsg = "닉네임은 10자이하여야 합니다.";
+                this.isValidateNewNickname = false;
+            } else if (space_str.test(this.inputNewNickname) || special_str.test(this.inputNewNickname)) {
+                this.newNicknameMsg = "닉네임은 공백, 특수문자를 포함할 수 없습니다."
+                this.isValidateNewNickname = false;
+            } else {
+                this.newNicknameMsg = "사용 가능한 닉네임입니다."
+                this.isValidateNewNickname = true;
+                this.newNickname = this.inputNewNickname;
+            }
+        },
+
+        async changeNickname() {
+            
+            if (!this.isValidateCurrNickname || !this.isValidateNewNickname) {
+                alert("기존 닉네임과 새로운 닉네임을 조회하고 변경해주세요");
+                return;
+            }
+
+            await this.$axios.put(`/userinfo/${this.currNickname}/${this.newNickname}`);
+            alert(`닉네임을 변경하였습니다 : [${this.currNickname}] -> [${this.newNickname}]`);
+
+            this.inputCurrNickname = "";
+            this.currNickname = "";
+            this.currNicknameMsg = "";
+            this.isValidateCurrNickname = false;
+
+            this.inputNewNickname = "";
+            this.newNickname = "";
+            this.newNicknameMsg = "";
+            this.isValidateNewNickname = false;
+
+        },
+
+        inputCurrNicknameCancel() {
+            this.currNickname = "";
+            this.isValidateCurrNickname = false;
+            this.currNicknameMsg = "";
+        },
+
+        inputNewNicknameCancel() {
+            this.newNickname = "";
+            this.isValidateNewNickname = false;
+            this.newNicknameMsg = "";
+        }
     }
     
 }
@@ -50,18 +113,30 @@ export default {
             </div>
         </div>
         <div id="content" class="col-container">
-            <div id="userNicknameInput" class="input-group row-container">
-                <input class="nickname-input" type="text" placeholder="유저 닉네임">
-                <button class="button-sub-sm">조회</button>
+            <div v-if="!isValidateCurrNickname" id="userNicknameInput" class="input-group row-container">
+                <input class="nickname-input" type="text" placeholder="유저 닉네임" v-model="inputCurrNickname">
+                <button class="button-sub-sm" @click="validateCurrNickname">조회</button>
             </div>
-            <div class="alert center-item">유저가 확인되었습니다</div>
+            <div v-else id="userNicknameInput" class="input-group row-container disabled">
+                <input class="nickname-input" type="text" placeholder="유저 닉네임" v-model="currNickname" disabled>
+                <button class="button-sub-sm" @click="inputCurrNicknameCancel">수정</button>
+            </div>
+            <div v-if="isValidateCurrNickname" class="alert center-item">{{ currNicknameMsg }}</div>
+            <div v-else class="alert-err center-item">{{ currNicknameMsg }}</div>
+
             <img id="downArrow" src="@/assets/img/down_arrow.png">
-            <div class="input-group row-container">
-                <input class="nickname-input" type="text" placeholder="변경할 닉네임">
-                <button class="button-sub-sm">조회</button>
+            <div v-if="!isValidateNewNickname" class="input-group row-container">
+                <input class="nickname-input" type="text" placeholder="변경할 닉네임" v-model="inputNewNickname">
+                <button class="button-sub-sm" @click="validateNewNickname">조회</button>
             </div>
-            <div class="alert center-item">사용할 수 있는 닉네임입니다</div>
-            <button id="nicknameEditButton" class="button-main-lg center-item">닉네임 변경</button>
+            <div v-else class="input-group row-container disabled">
+                <input class="nickname-input" type="text" placeholder="변경할 닉네임" v-model="newNickname" disabled>
+                <button class="button-sub-sm" @click="inputNewNicknameCancel">수정</button>
+            </div>
+            <div v-if="isValidateNewNickname" class="alert center-item">{{ newNicknameMsg }}</div>
+            <div v-else class="alert-err center-item">{{ newNicknameMsg }}</div>
+
+            <button id="nicknameEditButton" class="button-main-lg center-item" @click="changeNickname">닉네임 변경</button>
         </div>
     </div>
 </template>
@@ -145,6 +220,20 @@ export default {
     margin-top: 10px;
     margin-bottom: 15px;
     padding-left: 10px;
+}
+
+.alert-err {
+    width: 370px;
+    height: 20px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    padding-left: 10px;
+
+    color: red;
+}
+
+.disabled {
+    font-weight: bolder;
 }
 
 #mainPage {

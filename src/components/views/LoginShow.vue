@@ -49,9 +49,9 @@ export default {
     <div id="loginPage" class="col-container">
         <div id="title" class="main-text">GAM DB 관리자 페이지</div>
         <div id="versionInfo" class="main-text">버전 1.0.0</div>
-        <div id="input-admin-info" class="row-container">
-            <input id="idInput" class="input-block" type="text" v-model="inputId" placeholder="아이디">
-            <input id="pwInput" class="input-block" type="password" v-model="inputPwd" placeholder="패스워드">
+        <div id="input-admin-info" class="col-container">
+            <input id="idInput" class="input-block main-text" type="text" v-model="inputId" placeholder="아이디">
+            <input id="pwInput" class="input-block main-text" type="password" v-model="inputPwd" placeholder="패스워드">
         </div>
         <div id="message" class="main-text"><BIconExclamationCircle v-if="msg !== ''"/> {{ msg }}</div>
         <button id="loginButton" class="main-text" @click="validateAccount()">로그인</button>
@@ -97,7 +97,6 @@ export default {
 }
 
 #idInput {
-    margin-right: 20px;
     margin-top: 100px;
     background-color: #f7f7f7;
     border: 1px solid #f7f7f7;
@@ -107,7 +106,7 @@ export default {
 }
 
 #pwInput {
-    margin-top: 100px;
+    margin-top: 20px;
     background-color: #f7f7f7;
     border: 1px solid #f7f7f7;
     border-radius: 5px;
@@ -126,7 +125,7 @@ export default {
 }
 
 #message {
-    width: 630px;
+    width: 300px;
     margin-top: 20px;
     color: red;
 }
