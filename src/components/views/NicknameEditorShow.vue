@@ -1,8 +1,8 @@
 <script>
-import { BIconExclamationCircle } from 'bootstrap-icons-vue';
+import { BIconExclamationCircle, BIconCheckSquare, BIconArrowDownCircleFill } from 'bootstrap-icons-vue';
 export default {
 
-    components: { BIconExclamationCircle },
+    components: { BIconExclamationCircle, BIconCheckSquare, BIconArrowDownCircleFill },
 
     data() {
         return {
@@ -26,11 +26,10 @@ export default {
             console.log(user);
 
             if (user.id !== undefined) {
-                this.currNicknameMsg = "유저 조회 성공!";
                 this.isValidateCurrNickname = true;
                 this.currNickname = this.inputCurrNickname;
             } else {
-                this.currNicknameMsg = "존재 하지 않는 유저입니다.";
+                alert("존재하지 않는 유저입니다.");
                 this.isValidateCurrNickname = false;
             }
         },
@@ -45,16 +44,16 @@ export default {
             const special_str = /[~!@#$%^&*()_+|<>?:{}]/;
 
             if (users.filter(user => user.nickname === this.inputNewNickname).length > 0) {
-                this.newNicknameMsg = "이미 존재하는 닉네임입니다.";
+                alert("이미 존재하는 닉네임입니다.");
                 this.isValidateNewNickname = false;
             } else if (this.inputNewNickname.length > 10) {
-                this.newNicknameMsg = "닉네임은 10자이하여야 합니다.";
+                alert("닉네임은 10자이하여야 합니다.");
                 this.isValidateNewNickname = false;
             } else if (space_str.test(this.inputNewNickname) || special_str.test(this.inputNewNickname)) {
-                this.newNicknameMsg = "닉네임은 공백, 특수문자를 포함할 수 없습니다."
+                alert("닉네임은 공백, 특수문자를 포함할 수 없습니다.");
                 this.isValidateNewNickname = false;
             } else {
-                this.newNicknameMsg = "사용 가능한 닉네임입니다."
+                alert("사용 가능한 닉네임입니다.");
                 this.isValidateNewNickname = true;
                 this.newNickname = this.inputNewNickname;
             }
@@ -101,7 +100,7 @@ export default {
 <template>
     <div id="mainPage" class="row-container">
         <div id="userInfo" class="col-container">
-            <div id="title">GAM DB<br>관리자 페이지</div>
+            <a href="/" id="title">GAM DB<br>관리자 페이지</a>
             <img id="profileImage" class="center-item" src="@/assets/img/huni_profile.png">
             <div id="profileName" class="center-item">
                 <span id="admin">관리자</span>
@@ -113,28 +112,28 @@ export default {
             </div>
         </div>
         <div id="content" class="col-container">
-            <div v-if="!isValidateCurrNickname" id="userNicknameInput" class="input-group row-container">
+            <form v-if="!isValidateCurrNickname" id="userNicknameInput" class="input-group row-container" v-on:submit.prevent="validateCurrNickname">
+                <BIconCheckSquare class="check-square" style="color: gray;"/>
                 <input class="nickname-input" type="text" placeholder="유저 닉네임" v-model="inputCurrNickname">
-                <button class="button-sub-sm" @click="validateCurrNickname">조회</button>
-            </div>
-            <div v-else id="userNicknameInput" class="input-group row-container disabled">
-                <input class="nickname-input" type="text" placeholder="유저 닉네임" v-model="currNickname" disabled>
+                <button class="button-sub-sm" type="submit">조회</button>
+            </form>
+            <div v-else id="userNicknameInput" class="input-group row-container">
+                <BIconCheckSquare class="check-square"/>
+                <input class="nickname-input disabled" type="text" placeholder="유저 닉네임" v-model="currNickname" disabled>
                 <button class="button-sub-sm" @click="inputCurrNicknameCancel">수정</button>
             </div>
-            <div v-if="isValidateCurrNickname" class="alert center-item">{{ currNicknameMsg }}</div>
-            <div v-else class="alert-err center-item">{{ currNicknameMsg }}</div>
 
-            <img id="downArrow" src="@/assets/img/down_arrow.png">
-            <div v-if="!isValidateNewNickname" class="input-group row-container">
+            <BIconArrowDownCircleFill class="arrow-down"/>
+            <form v-if="!isValidateNewNickname" class="input-group row-container" v-on:submit.prevent="validateNewNickname">
+                <BIconCheckSquare class="check-square" style="color: gray;"/>
                 <input class="nickname-input" type="text" placeholder="변경할 닉네임" v-model="inputNewNickname">
-                <button class="button-sub-sm" @click="validateNewNickname">조회</button>
-            </div>
-            <div v-else class="input-group row-container disabled">
-                <input class="nickname-input" type="text" placeholder="변경할 닉네임" v-model="newNickname" disabled>
+                <button class="button-sub-sm" type="submit">조회</button>
+            </form>
+            <div v-else class="input-group row-container">
+                <BIconCheckSquare class="check-square"/>
+                <input class="nickname-input disabled" type="text" placeholder="변경할 닉네임" v-model="newNickname" disabled>
                 <button class="button-sub-sm" @click="inputNewNicknameCancel">수정</button>
             </div>
-            <div v-if="isValidateNewNickname" class="alert center-item">{{ newNicknameMsg }}</div>
-            <div v-else class="alert-err center-item">{{ newNicknameMsg }}</div>
 
             <button id="nicknameEditButton" class="button-main-lg center-item" @click="changeNickname">닉네임 변경</button>
         </div>
@@ -214,6 +213,15 @@ export default {
     padding-left: 10px;
 }
 
+.check-square {
+    width: 40px;
+    height: 40px;
+    margin-top: auto;
+    margin-bottom: auto;
+    color: green;
+    margin-right: 10px;
+}
+
 .alert {
     width: 370px;
     height: 20px;
@@ -234,6 +242,17 @@ export default {
 
 .disabled {
     font-weight: bolder;
+}
+
+.arrow-down {
+    margin-left: auto;
+    margin-right: auto;
+
+    color: #0067a3;
+    width: 40px;
+    height: 40px;
+    margin-top: 30px;
+    margin-bottom: 40px;
 }
 
 #mainPage {
@@ -262,6 +281,8 @@ export default {
     font-size: 48px;
     font-weight: bold;
     background-color: #17171b;
+    text-decoration-line: none;
+    color: white;
 }
 
 #profileImage {

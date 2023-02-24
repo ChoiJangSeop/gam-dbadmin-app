@@ -1,8 +1,8 @@
 <script>
-import { BIconArrowRightSquare } from 'bootstrap-icons-vue';
+import { BIconArrowRightSquare, BIconCheckSquare, BIconArrowLeftSquareFill } from 'bootstrap-icons-vue';
 export default {
 
-    components: { BIconArrowRightSquare },
+    components: { BIconArrowRightSquare, BIconCheckSquare, BIconArrowLeftSquareFill },
     
     data() {
         return {
@@ -24,6 +24,8 @@ export default {
             resultItems : [],   // 검색된 아이템들  
 
             itemList: [],   // 지급할 아이템
+            giftNum: 0,     // 입력한 선물개수
+            memo: "",   // 메모
 
         }
     },
@@ -33,10 +35,10 @@ export default {
 
             if (this.inputSendUser === "" || this.inputSendUser === "system") {
                 this.sendUser = {
-                    nickname: "system",
+                    nickname: "삐에로",
                 };
                 this.isConfirmSendUser = true;
-                this.inputSendUser = "보내는 유저 : system";
+                this.inputSendUser = "보내는 유저 : 삐에로";
                 return;
             }
 
@@ -110,6 +112,7 @@ export default {
             }
 
             const gift = {
+                idx: this.giftNum++,
                 sendUser: this.sendUser,
                 receiveUser: this.receiveUser,
                 expireDate: this.expireDate,
@@ -120,8 +123,33 @@ export default {
             this.itemList.push(gift);
         },
 
+        removeGift(idx) {
+            this.itemList = this.itemList.filter(item => item.idx !== idx);
+        },
+
         initGiftList() {
             this.itemList = [];
+        },
+
+        itemDispense() {
+
+            this.itemList.forEach(gift => {
+                const dto = {
+                    sendUserNickname: gift.sendUser.nickname,
+                    receiveUserNickname: gift.receiveUser.nickname,
+                    giftItemName: gift.item.name,
+                    memo: this.memo,
+                    sendDate: new Date(),
+                    expireDate: gift.expireDate
+                };
+
+                this.$axios.post(`/gifts`, dto);
+            });
+
+            alert("아이템이 모두 지급되었습니다!");
+
+            this.itemList = [];
+            this.giftNum = 0;
         }
     },
 
@@ -149,7 +177,7 @@ export default {
 <template>
     <div id="mainPage" class="row-container">
         <div id="userInfo" class="col-container">
-            <div id="title">GAM DB<br>관리자 페이지</div>
+            <a href="/" id="title">GAM DB<br>관리자 페이지</a>
             <img id="profileImage" class="center-item" src="@/assets/img/huni_profile.png">
             <div id="profileName" class="center-item">
                 <span id="admin">관리자</span>
@@ -163,33 +191,39 @@ export default {
         <div id="content" class="row-container">
             <div class="col-container">
                 <form v-if="!isConfirmSendUser" id="senderInput" class="input-group row-container" v-on:submit.prevent="getSendUser">
+                    <BIconCheckSquare class="check-square" style="color: gray;"/>
                     <input class="nickname-input" type="text" placeholder="보내는 유저" v-model="inputSendUser">
                     <button class="button-sub-sm" type="submit">조회</button>
                 </form>
                 <div v-else id="senderInput" class="input-group row-container">
+                    <BIconCheckSquare class="check-square"/>
                     <input class="nickname-input confirm" type="text" placeholder="보내는 유저" v-model="inputSendUser" disabled>
                     <button class="button-sub-sm" @click="sendUserCancel">수정</button>
                 </div>
                 <form v-if="!isConfirmReceiveUser" id="receiverInput" class="input-group row-container" v-on:submit.prevent="getReceiveUser">
+                    <BIconCheckSquare class="check-square" style="color: gray;"/>
                     <input class="nickname-input" type="text" placeholder="받는 유저" v-model="inputReceiveUser">
                     <button class="button-sub-sm" type="submit">조회</button>
                 </form>
                 <div v-else id="receiverInput" class="input-group row-container">
+                    <BIconCheckSquare class="check-square"/>
                     <input class="nickname-input confirm" type="text" placeholder="받는 유저" v-model="inputReceiveUser" disabled>
                     <button class="button-sub-sm" @click="receiveUserCancel">수정</button>
                 </div>
                 <form v-if="!isConfirmExpireDate" id="expireDateInput" class="row-container" v-on:submit.prevent="confirmExpireDate">
+                    <BIconCheckSquare class="check-square" style="color: gray;"/>
                     <select class="nickname-input" v-model="keepingDay">
                         <option value="">만료 일</option>
                         <option value="direct">직접입력</option>
                         <option value="7">1주후(7일)</option>
-                        <option value="14">2주후(14일)</option>
+                        <option value="14" selected>2주후(14일)</option>
                         <option value="30">1달후(30일)</option>
                         <option value="365">1년후(365일)</option>
                     </select>
                     <button class="button-main-sm" type="submit">확인</button>
                 </form>
                 <div v-else id="expireDateInput" class="row-container">
+                    <BIconCheckSquare class="check-square"/>
                     <select class="nickname-input" v-model="keepingDay" disabled>
                         <option value="">만료 일</option>
                         <option value="direct">직접입력</option>
@@ -200,16 +234,13 @@ export default {
                     </select>
                     <button class="button-main-sm" @click="cancelExpireDate">수정</button>
                 </div>
-                <div v-if="isDirectInput && !isConfirmExpireDate">
-                    <input class="nickname-input" type="date" style="margin-top: 10px; height: 20px;" v-model="expireDate">
-                </div>
                 <div v-if="!isConfirmExpireDate" id="expireDate">
                     예상 만료일 : {{ expireDate.getFullYear() }}년 {{ expireDate.getMonth()+1 }}월 {{ expireDate.getDate() }}일
                 </div>
                 <div v-else id="expireDate" class="confirm" style="color: white;">
                     만료일 : {{ expireDate.getFullYear() }}년 {{ expireDate.getMonth()+1 }}월 {{ expireDate.getDate() }}일
                 </div>
-                
+                <textarea id="memo" v-model="memo" placeholder="메모를 작성하세요."></textarea>
             </div>
             <div id="itemInfo" class="col-container">
                 <form id="itemInput" class="input-group row-container" v-on:submit.prevent="searchItem">
@@ -226,12 +257,12 @@ export default {
                 </div>
                 <div id="itemDispense" class="input-group row-container" style="margin-top: 100px;">
                     <div id="itemList" class="nickname-input" style="background-color:#202026; padding: 10px;">
-                        <div v-for="item in itemList" :key="item.id" id="giftList">
-                            [{{ item.sendUser.nickname }}] -> [{{ item.receiveUser.nickname }}] : {{ item.item.name }}
+                        <div v-for="item in itemList" :key="item.idx" id="giftList">
+                            <button class="giftCancelButton" @click="removeGift(item.idx)">-</button>[{{ item.sendUser.nickname }}] -> [{{ item.receiveUser.nickname }}] : {{ item.item.name }}
                         </div>
                     </div>
                     <div class="col-container">
-                        <button id="dispenseButton" class="button-sub-sm">지급</button>
+                        <button id="dispenseButton" class="button-sub-sm" @click="itemDispense">지급</button>
                         <button class="button-sub-sm" @click="initGiftList">초기화</button>
 
                     </div>
@@ -327,11 +358,20 @@ export default {
 }
 
 .item-button {
-    width: 390px;
+    width: 410px;
     height: 30px;
 
     text-align: left;
     font-size: 15px;
+}
+
+.check-square {
+    width: 40px;
+    height: 40px;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 10px;
+    color: green;
 }
 
 #mainPage {
@@ -360,6 +400,8 @@ export default {
     font-size: 48px;
     font-weight: bold;
     background-color: #17171b;
+    text-decoration-line: none;
+    color:white;
 }
 
 #profileImage {
@@ -409,7 +451,7 @@ export default {
 }
 
 #itemList {
-    width: 390px;
+    width: 410px;
     height: 230px;
     padding: 0;
     color: black;
@@ -425,11 +467,25 @@ export default {
 #expireDate {
     margin-top: 10px;
     margin-right: 20px;
-    margin-left: 10px;
+    margin-left: 60px;
 }
 
 #giftList {
     color: white;
     overflow-y: scroll;
+    margin-bottom: 3px;
+}
+
+#memo {
+    margin-top: 70px;
+    height: 230px;
+    font-size: 16px;
+    padding: 10px;
+    background-color: #202026;
+    color: white;
+}
+
+.giftCancelButton {
+    margin-right:5px;
 }
 </style>

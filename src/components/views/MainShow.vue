@@ -57,7 +57,7 @@ export default {
 
 .button-main {
     width: 150px;
-    height: 30px;
+    height: 40px;
     color: white;
     background-color: #0067a3;
     border: 1px solid #0067a3;
@@ -66,7 +66,7 @@ export default {
 
 .button-sub {
     width: 150px;
-    height: 30px;
+    height: 40px;
     color: white;
     background-color: gray;
     border: 1px solid gray;
