@@ -3,6 +3,7 @@ import LoginShow from '@/components/views/LoginShow.vue';
 import MainShow from '@/components/views/MainShow.vue';
 import NicknameEditorShow from '@/components/views/NicknameEditorShow.vue';
 import ItemDispenserShow from '@/components/views/ItemDispenserShow.vue';
+import { VueCookies } from 'vue-cookies';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

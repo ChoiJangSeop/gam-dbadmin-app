@@ -21,23 +21,29 @@ export default {
     },
 
     methods: {
-        validateAccount() {
+        async validateAccount() {
 
             let currUser = this.users.filter(user => user.id === this.inputId);
 
-            if (currUser.length === 0) {
-                this.msg = "존재 하지 않는 아이디 입니다.";
-                this.inputId = "";
-                this.inputPwd =  "";
-            }
+            try { 
+                const res = await this.$axios.post(`/login`, {
+                    account: this.inputId,
+                    password: this.inputPwd,
+                });
 
-            else if (currUser[0].pwd !== this.inputPwd) {
-                this.msg = "비밀번호를 잘못 입력했습니다.";
-                this.inputPwd = "";
-            }
+                this.$store.commit('setUsername', res.data.name);
+                this.$store.commit('setToken', res.data.token);
+                this.$router.push('/');
+                
 
-            else {
 
+            } catch (ex) {
+                if (ex.response && ex.response.status === 401) {
+                    alert("로그인에 실패하였습니다");
+                } else {
+                    console.log(ex);
+                    alert("로그인 인증 중 예상치 못한 문제가 발생하였습니다.\n같은 문제가 반복시 개발자에게 문의하세요");
+                }
             }
         }
     }
