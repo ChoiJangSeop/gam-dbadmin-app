@@ -1,5 +1,37 @@
 <script>
 export default {
+
+    data() {
+        return {
+            adminName: "",
+        }
+    },
+
+    methods: {
+        logout() {
+            alert("로그아웃 되었습니다");
+            this.$store.commit("clearUsername");
+            this.$router.push({ path: "/login" });
+        },
+
+        goNicknameEditor() {
+            this.$router.push({ path: "/nickname-editor" });
+        },
+
+        goItemDispensor() {
+            this.$router.push({ path: "/item-dispenser" });
+        },
+    },
+
+    mounted() {
+        
+        if (!this.$store.getters.isLogin) {
+            alert("로그인이 필요합니다.");
+            this.$router.push({ path: "/login" });
+        }
+
+        this.adminName = this.$store.state.username;
+    }
     
 }
 </script>
@@ -11,25 +43,25 @@ export default {
             <img id="profileImage" class="center-item" src="@/assets/img/huni_profile.png">
             <div id="profileName" class="center-item">
                 <span id="admin">관리자</span>
-                <span id="adminName">관리자이름</span>
+                <span id="adminName">{{ this.adminName }}</span>
             </div>
             <div id="buttonGroup" class="row-container">
                 <button id="editInfo" class="button-main">정보수정</button>
-                <button id="logout" class="button-sub">로그아웃</button>
+                <button id="logout" class="button-sub" @click="logout">로그아웃</button>
             </div>
         </div>
         <div id="content" class="col-container">
             <div id="contentTitle"><h2>관리자 기능</h2></div>
             <div class="method-container row-container">
                 <div class="method-content">
-                    <a class="method-url" href="/nickname-editor">유저 닉네임 변경</a>
+                    <button class="method-url" @click="goNicknameEditor">유저 닉네임 변경</button>
                     <p>현재의 닉네임과 변경할 닉네임을 입력해 유저의 닉네임을 변경합니다.</p>
                 </div>
             </div>
 
             <div class="method-container row-container">
                 <div class="method-content">
-                    <a class="method-url" href="/item-dispenser">아이템 지급</a>
+                    <button class="method-url" @click="goItemDispensor">아이템 지급</button>
                     <p>아이템을 주고 받을 유저의 닉네임과 아이템을 입력하여 선물함에 아이템을 지급합니다.<br>
                     주는 유저를 입력하지 않을 경우, 관리자의 이름으로 아이템이 지급됩니다.</p>
                 </div>
@@ -93,6 +125,8 @@ export default {
     font-size: 24px;
     font-weight: bolder;
     color: #0067a3;
+    background-color: rgba(0,0,0,0);
+    border: 0;
     text-decoration: none;
 }
 

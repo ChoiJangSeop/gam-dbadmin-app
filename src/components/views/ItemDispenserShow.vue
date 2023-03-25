@@ -27,6 +27,7 @@ export default {
             giftNum: 0,     // 입력한 선물개수
             memo: "",   // 메모
 
+            adminName: "",
         }
     },
 
@@ -150,6 +151,10 @@ export default {
 
             this.itemList = [];
             this.giftNum = 0;
+        },
+
+        goMainPage() {
+            this.$router.push({ path: "/" });
         }
     },
 
@@ -168,6 +173,16 @@ export default {
                 this.expireDate.setDate(this.expireDate.getDate() + this.keepingDay);
             }
         }
+    },
+
+    mounted() {
+
+        if (!this.$store.getters.isLogin) {
+            alert("로그인이 필요합니다");
+            this.$router.push({ path: "/login"});
+        }
+
+        this.adminName = this.$store.state.username;
     }
 
     
@@ -177,11 +192,11 @@ export default {
 <template>
     <div id="mainPage" class="row-container">
         <div id="userInfo" class="col-container">
-            <a href="/" id="title">GAM DB<br>관리자 페이지</a>
+            <button @click="goMainPage()" id="title" style="border: 0;">GAM DB<br>관리자 페이지</button>
             <img id="profileImage" class="center-item" src="@/assets/img/huni_profile.png">
             <div id="profileName" class="center-item">
                 <span id="admin">관리자</span>
-                <span id="adminName">관리자이름</span>
+                <span id="adminName">{{ this.adminName }}</span>
             </div>
             <div id="buttonGroup" class="row-container">
                 <button id="editInfo" class="button-main">정보수정</button>

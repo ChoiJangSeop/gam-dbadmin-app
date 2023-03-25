@@ -1,5 +1,6 @@
 <script>
 import { BIconExclamationCircle, BIconCheckSquare, BIconArrowDownCircleFill } from 'bootstrap-icons-vue';
+import ApiController from '../../api/ApiController.js';
 export default {
 
     components: { BIconExclamationCircle, BIconCheckSquare, BIconArrowDownCircleFill },
@@ -15,6 +16,8 @@ export default {
             isValidateNewNickname: false,
             currNicknameMsg: "",
             newNicknameMsg: "",
+
+            adminName: "",
         }
     },
 
@@ -23,6 +26,8 @@ export default {
         async validateCurrNickname() {
             const res = await this.$axios.get(`/userinfo/nickname/${this.inputCurrNickname}`);
             const user = res.data;
+            // const res = await ApiController.get(`/userinfo/nikcname/${this.inputCurrNickname}`);
+            // const user = res.data;
             console.log(user);
 
             if (user.id !== undefined) {
@@ -91,7 +96,20 @@ export default {
             this.newNickname = "";
             this.isValidateNewNickname = false;
             this.newNicknameMsg = "";
+        },
+
+        goMainPage() {
+            this.$router.push({ path: "/" });
         }
+    },
+
+    mounted() {
+        if (!this.$store.getters.isLogin) {
+            alert("로그인이 필요합니다.");
+            this.$router.push({ path: "/login" });
+        }
+
+        this.adminName = this.$store.state.username;
     }
     
 }
@@ -100,11 +118,11 @@ export default {
 <template>
     <div id="mainPage" class="row-container">
         <div id="userInfo" class="col-container">
-            <a href="/" id="title">GAM DB<br>관리자 페이지</a>
+            <button @click="goMainPage()" id="title" style="border: 0;">GAM DB<br>관리자 페이지</button>
             <img id="profileImage" class="center-item" src="@/assets/img/huni_profile.png">
             <div id="profileName" class="center-item">
                 <span id="admin">관리자</span>
-                <span id="adminName">관리자이름</span>
+                <span id="adminName">{{ this.adminName }}</span>
             </div>
             <div id="buttonGroup" class="row-container">
                 <button id="editInfo" class="button-main">정보수정</button>
