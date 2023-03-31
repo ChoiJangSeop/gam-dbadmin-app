@@ -45,6 +45,10 @@ export default {
                     alert("로그인 인증 중 예상치 못한 문제가 발생하였습니다.\n같은 문제가 반복시 개발자에게 문의하세요");
                 }
             }
+        },
+
+        goSignupPage() {
+            this.$router.push({ path: "/signup" });
         }
     }
     
@@ -61,6 +65,7 @@ export default {
         </div>
         <div id="message" class="main-text"><BIconExclamationCircle v-if="msg !== ''"/> {{ msg }}</div>
         <button id="loginButton" class="main-text" @click="validateAccount()">로그인</button>
+        <button id="loginButton" class="main-text" style="background-color: gray;" @click="goSignupPage()">회원가입</button>
     </div>
 </template>
 
