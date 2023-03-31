@@ -97,6 +97,7 @@ export default {
 }
 
 #title {
+    margin-top: 120px;
     font-size: 56px;
     font-weight: bold;
 }
