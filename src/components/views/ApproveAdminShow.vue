@@ -15,31 +15,35 @@ export default {
             this.$router.push({ path: "/login" });
         },
 
-        goNicknameEditor() {
-            this.$router.push({ path: "/nickname-editor" });
+        goMainPage() {
+            this.$router.push({ path: "/" });
         },
 
-        goItemDispensor() {
-            this.$router.push({ path: "/item-dispenser" });
-        },
-
-        isMaster() {
-            return this.$store.state.status === "MASTER";
-        },
-
-        goApprovePage() {
-            this.$router.push({ path: "/approve" });
+        async approveAdmin(admin) {
+            const res = await this.$axios.put(`/admin/${admin.account}/allow`);
+            alert(`${admin.name}의 권한이 승인되었습니다`);
+            this.waitAdmins = this.waitAdmins.filter(a => a.account !== admin.account);
         }
+
     },
 
-    mounted() {
+    async mounted() {
         
         if (!this.$store.getters.isLogin) {
             alert("로그인이 필요합니다.");
             this.$router.push({ path: "/login" });
         }
 
+        if (this.$store.state.status !== "MASTER") {
+            alert("해당 페이지에 접근 권한이 없습니다.");
+            this.$router.push({ paht: "/" });
+        }
+
         this.adminName = this.$store.state.username;
+
+        const res = await this.$axios.get(`/admin`);
+        this.waitAdmins = res.data._embedded.signResponseList;
+        this.waitAdmins = this.waitAdmins.filter(admin => admin.status === "NOT_ALLOWED");       
     }
     
 }
@@ -59,23 +63,15 @@ export default {
                 <button id="logout" class="button-sub" @click="logout">로그아웃</button>
             </div>
             <div class="row-container">
-                <button v-if="isMaster()" id="approveButton" @click="goApprovePage()">사용자 승인하기</button>
+                <button id="backButton" @click="goMainPage()">뒤로가기</button>
             </div>
         </div>
         <div id="content" class="col-container">
-            <div id="contentTitle"><h2>관리자 기능</h2></div>
-            <div class="method-container row-container">
-                <div class="method-content">
-                    <button class="method-url" @click="goNicknameEditor">유저 닉네임 변경</button>
-                    <p>현재의 닉네임과 변경할 닉네임을 입력해 유저의 닉네임을 변경합니다.</p>
-                </div>
-            </div>
-
-            <div class="method-container row-container">
-                <div class="method-content">
-                    <button class="method-url" @click="goItemDispensor">아이템 지급</button>
-                    <p>아이템을 주고 받을 유저의 닉네임과 아이템을 입력하여 선물함에 아이템을 지급합니다.<br>
-                    주는 유저를 입력하지 않을 경우, 관리자의 이름으로 아이템이 지급됩니다.</p>
+            <div v-for="admin in waitAdmins" :key="admin.account" class="method-container row-container">
+                <div class="method-content row-container">
+                    <div class="method-url" @click="goItemDispensor">{{ admin.name }}</div>
+                    <p style="width: 650px;">{{ admin.account }}</p>
+                    <button id="approveButton" class="button-main" @click="approveAdmin(admin)">승인</button>
                 </div>
             </div>
         </div>
@@ -119,12 +115,12 @@ export default {
 
 .method-container {
     width: 80%;
-    height: 150px;
+    height: 50px;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 5%;
+    margin-bottom: 2%;
 
-    border: 1.5px solid #202026;
+    border: 1.5px solid white;
     border-radius: 15px;
     
     padding: 15px;
@@ -134,12 +130,16 @@ export default {
 }
 
 .method-url {
+    width: 150px;
     font-size: 24px;
+    margin-top: auto;
+    margin-bottom: auto;
     font-weight: bolder;
-    color: #0067a3;
+    color: white;
     background-color: rgba(0,0,0,0);
     border: 0;
     text-decoration: none;
+    
 }
 
 #mainPage {
@@ -203,13 +203,19 @@ export default {
     margin-bottom: 3%;
 }
 
-#approveButton {
+#backButton {
     width: 307px;
     height: 40px;
     color: white;
-    background-color: #ffc107;
-    border: 1px solid #ffc107;
+    background-color: gray;
+    border: 1px solid gray;
     border-radius: 5px;
     margin-top: 10px;
+}
+
+#approveButton {
+    width: 60px;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 </style>

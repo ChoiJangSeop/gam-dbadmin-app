@@ -5,11 +5,16 @@ const store = createStore({
         return {
             username: '',
             token: '',
+            status: '',
         }
     },
     getters: {
         isLogin(state) {
             return state.username !== '';
+        },
+
+        isAllowed(state) {
+            return state.status === "MASTER" || state.status === "ALLOWED";
         },
     },
     mutations: {
@@ -19,6 +24,11 @@ const store = createStore({
         setToken(state, token) {
             state.token = token;
         },
+
+        setStatus(state, status) {
+            state.status = status;
+        },
+
         clearUsername(state) {
             state.username = '';
         },

@@ -109,6 +109,11 @@ export default {
             this.$router.push({ path: "/login" });
         }
 
+        if (!this.$store.getters.isAllowed) {
+            alert("해당 페이지에 접근 권한이 없습니다.\n 권한을 허용하려면 책임자에게 요청하세요.");
+            this.$router.push({ path: "/" });
+        }
+
         this.adminName = this.$store.state.username;
     }
     

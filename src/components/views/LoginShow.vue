@@ -33,6 +33,7 @@ export default {
 
                 this.$store.commit('setUsername', res.data.name);
                 this.$store.commit('setToken', res.data.token);
+                this.$store.commit('setStatus', res.data.status);
                 this.$router.push('/');
                 
 
@@ -58,7 +59,7 @@ export default {
 <template>
     <div id="loginPage" class="col-container">
         <div id="title" class="main-text">GAM DB 관리자 페이지</div>
-        <div id="versionInfo" class="main-text">버전 1.0.0</div>
+        <div id="versionInfo" class="main-text">버전 0.1.0</div>
         <div id="input-admin-info" class="col-container">
             <input id="idInput" class="input-block main-text" type="text" v-model="inputId" placeholder="아이디">
             <input id="pwInput" class="input-block main-text" type="password" v-model="inputPwd" placeholder="패스워드">
@@ -104,7 +105,7 @@ export default {
 
 #versionInfo {
     font-size: 20px;
-    font-weight: bold;;
+    font-weight: bold;
     margin-top: 20px;
 }
 
